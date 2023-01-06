@@ -1,0 +1,20 @@
+[project]
+name = "hubspace-ng"
+version = "0.0.1"
+authors = [
+  { name="Shawn McNaughton", email="shawngmc@gmail.com" },
+]
+description = "A python package to interface with the Afero Hubspace service for smart home devices"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.9"
+dependencies = [
+]
+
+[project.urls]
+"Homepage" = "https://github.com/shawngmc/hubspace-ng"
+"Bug Tracker" = "https://github.com/shawngmc/hubspace-ng/issues"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
