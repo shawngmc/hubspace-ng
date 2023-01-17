@@ -6,11 +6,13 @@ import requests
 import datetime
 import json
 
-from .const import API_ENDPOINT, DEFAULT_CLIENT_PARAMS, DEFAULT_DURATION, DEFAULT_EXPIRATION_BUFFER, HUBSPACE_OAUTH_REALM
-from .client.account import HubspaceAccountClient
-from .client.devices import HubspaceDeviceClient
+from ..const import API_ENDPOINT, DEFAULT_CLIENT_PARAMS, DEFAULT_DURATION, DEFAULT_EXPIRATION_BUFFER, HUBSPACE_OAUTH_REALM
 
-# See reference:
+# Pattern reference: https://bhomnick.net/design-pattern-python-api-client/
+
+# API Ref: ???
+
+# Do not use:
 # - https://developer.afero.io/CloudAPIs
 # - https://developer.afero.io/API-OAuthEndpoints
 
@@ -70,15 +72,15 @@ def _getRefreshToken(username, password):
 
 class HubspaceSessionClient:
 
-    _api = f"https://{API_ENDPOINT})/v1/"
+    _api = f"https://{API_ENDPOINT}/v1/"
 
     _refresh_token = None
 
     _access_token = None
     _access_token_exp = 0
 
-    _account_client = None
-    _devices_client = None
+    _accountID = None
+
 
     def __init__(self, username=None, password=None, token=None, token_duration=DEFAULT_DURATION, _expiration_buffer=DEFAULT_EXPIRATION_BUFFER):
         self._username = username
@@ -87,18 +89,8 @@ class HubspaceSessionClient:
         self._token_duration = token_duration
         self._expiration_buffer = _expiration_buffer
 
-    def account(self):
-        if _account_client = None:
-            _account_client = HubspaceAccountClient(self)
-        return _account_client
-
-    def devices(self):
-        if _devices_client = None:
-            _devices_client = HubspaceDeviceClient(self)
-        return _devices_client
-
     def _getRefreshToken(self):
-        if self._refresh_token == None:
+        if self._refresh_token is None:
             self._refresh_token = _getRefreshToken(self._username, self._password)
         return self._refresh_token
 
@@ -182,3 +174,10 @@ class HubspaceSessionClient:
         ) as r:
             return r.json()
 
+    def getInfo(self):
+        return self.get("users/me")
+
+    def getAccountID(self):
+        if self._accountID == None:
+            self._accountID = self.getInfo()['accountAccess'][0]['account']['accountId']
+        return self._accountID

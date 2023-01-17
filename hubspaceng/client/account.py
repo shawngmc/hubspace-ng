@@ -1,5 +1,5 @@
-from .const import API_ENDPOINT, METADATA_API_ENDPOINT
-from .hubspace_user import HubspaceSessionClient 
+from ..const import API_ENDPOINT, METADATA_API_ENDPOINT
+from .session import HubspaceSessionClient 
 
 # See reference:
 # - https://developer.afero.io/CloudAPIs
@@ -12,19 +12,9 @@ class HubspaceAccountClient:
     def __init__(self, client: HubspaceSessionClient):
         self._client = client
 
-    def getInfo(self):
-        return self._client.get("users/me")
-
-    def getAccountID(self):
-        if self._accountID == None:
-            self._accountID = self.getInfo()['accountAccess'][0]['account']['accountId']
-        return self._accountID
-
-    def getMetadata(self):
-        return self._client.get(f"accounts/{self._client.getAccountID()}/metadevices", host=METADATA_API_ENDPOINT)
 
     def getConclaveAccess(self):
-        return self._client.post(f"accounts/{self._client.getAccountID()}/conclaveAccess", data="{}", host=API_ENDPOINT)
+        return self._client.post(f"accounts/{self.getAccountID()}/conclaveAccess", data="{}", host=API_ENDPOINT)
 
     def ping(self):
         try:
