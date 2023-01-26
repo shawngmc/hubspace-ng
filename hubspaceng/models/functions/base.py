@@ -1,91 +1,129 @@
-import ..client
+"""Basic implementation of a configurable device function"""
+from typing import TYPE_CHECKING, Any
+
+from hubspaceng.const import METADATA_API_CALLING_HOST, METADATA_API_HOST
+from hubspaceng.errors import RequestError
+from hubspaceng.util import getUTCTime
+if TYPE_CHECKING:
+    from hubspaceng.account import HubspaceAccount
+    from hubspaceng.models.devices import BaseDevice
 
 class BaseFunction:
+    """Basic implementation of a configurable device function"""
     id: str
     title: str
-    client: HubspaceDeviceClient
+    device: "BaseDevice"
     raw_fragment: dict
+    func_class: str
+    func_instance: str
+    _value: Any = None
 
-    def __init__(self, id: str, title: str, raw_fragment: dict):
-        self.id = id
+    def __init__(self,
+        title: str,
+        device: "BaseDevice",
+        raw_fragment: dict):
+        self.id = raw_fragment["id"]
+        self.device = device
         self.title = title
+        self.func_class = raw_fragment.get('functionClass')
+        self.func_instance = raw_fragment.get('functionInstance')
         self.raw_fragment = raw_fragment
 
-    def update_value(new_value):
+    @property
+    def api(self) -> "API":
+        """Return API object"""
+        return self.device.api
+
+    @property
+    def value(self):
+        """Return the value for this device function"""
+        return self._value
+
+    @value.setter
+    async def value(self, new_value):
+        """Change the state for this function viaa the API server"""
+        if not self.validate_state(new_value):
+            raise ValueError(f"{new_value} is not a valid state for {self.title} ({self.id})")
+        try:
+            await self._set_remote_state(new_value)
+            self._value = new_value
+        except Exception as ex:
+            raise RequestError(f"Could not set device value for {self.id}") from ex
+
+    async def update(self):
+        """Update the value for this function from the API server"""
+        try:
+            new_value = await self._get_remote_state()
+            if not self.validate_state(new_value):
+                raise ValueError(f"{new_value} is not a valid state for {self.title} ({self.id})")
+            self._value = new_value
+        except Exception as ex:
+            raise RequestError(f"Could not update device {self.id}") from ex
+
+    def validate_state(self, new_value):
+        """Validate a potential new value for this function, either from the server or from client code"""
         raise NotImplementedError()
 
-    def modify_value(new_value):
-        raise NotImplementedError()
+    def _get_device_url(self):
+        return f"https://{METADATA_API_HOST}/v1/accounts/{self.device.account.id}/metadevices/{self.device.id}/state"
 
-    def get_value():
-        raise NotImplementedError()
+    async def _get_remote_state(self):
+        _, state_resp = await self.api.request(
+            method="get",
+            returns="json",
+            url=self._get_device_url(),
+            headers = {
+                "user-agent": "Dart/2.15 (dart:io)",
+                "Accept": "application/json",
+                "accept-encoding": "gzip",
+                "host": METADATA_API_CALLING_HOST
+            }
+        )
 
-    
-    def __get_state(self,child,desiredStateName):
-
-        state = None
-        
-        token = self.getAuthTokenFromRefreshToken()
-        
-        auth_header = {
-            "user-agent": "Dart/2.15 (dart:io)",
-            "host": "semantics2.afero.net",
-            "accept-encoding": "gzip",
-            "authorization": "Bearer " + token,
-        }
-        auth_url = "https://api2.afero.net/v1/accounts/" + self._accountId + "/metadevices/" + child + "/state"
-        auth_data = {}
-        headers = {}
-
-        r = requests.get(auth_url, data=auth_data, headers=auth_header)
-        r.close()
-        for lis in r.json().get('values'):
+        for lis in state_resp.get('values'):
             for key,val in lis.items():
-                if key == 'functionClass' and val == desiredStateName:
+                if key == 'functionClass' and val == self.func_class:
                     state = lis.get('value')
 
-        #print(desiredStateName + ": " + state)
         return state
-    
-    def __set_state(self,child,desiredStateName,state,instanceField=None):
-   
-        token = self.getAuthTokenFromRefreshToken()
-                
-        auth_data = {}
-        headers = {}
-        
-        utc_time = self.getUTCTime()
+
+    async def _set_remote_state(self, state):
+        utc_time = getUTCTime()
         payload = {
-            "metadeviceId": str(child),
+            "metadeviceId": str(self.device.id),
             "values": [
                 {
-                    "functionClass": desiredStateName,
+                    "functionClass": self.func_class,
                     "lastUpdateTime": utc_time,
                     "value": state
                 }
             ]
         }
-        
-        if instanceField is not None:
-            payload["values"][0]["functionInstance"] = instanceField
-            _LOGGER.debug("setting state with instance: " + instanceField )
-        
-        auth_header = {
-            "user-agent": "Dart/2.15 (dart:io)",
-            "host": "semantics2.afero.net",
-            "accept-encoding": "gzip",
-            "authorization": "Bearer " + token,
-            "content-type": "application/json; charset=utf-8",
-        }
 
+        if self.func_instance is not None:
+            payload["values"][0]["functionInstance"] = self.func_instance
+            # _LOGGER.debug("setting state with instance: " + self.func_instance )
 
-        auth_url = "https://api2.afero.net/v1/accounts/" + self._accountId + "/metadevices/" + child + "/state"
-        r = requests.put(auth_url, json=payload, headers=auth_header)
-        r.close()
-        for lis in r.json().get('values'):
+        _, set_resp = await self.api.request(
+            method="PUT",
+            returns="json",
+            url=self._get_device_url(),
+            headers = {
+                "user-agent": "Dart/2.15 (dart:io)",
+                "host": METADATA_API_CALLING_HOST,
+                "accept-encoding": "gzip",
+                "content-type": "application/json; charset=utf-8",
+            },
+            json = payload
+        )
+
+        for lis in set_resp.get('values'):
             for key,val in lis.items():
-                if key == 'functionClass' and val == desiredStateName:
+                if key == 'functionClass' and val == self.func_class:
                     state = lis.get('value')
 
-        #print(desiredStateName + ": " + state)
+        if not self.validate_state(state):
+            raise ValueError(f"{state} is not a valid state for {self.title} ({self.id})")
+        self._value = state
+
         return state

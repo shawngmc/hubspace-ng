@@ -1,52 +1,61 @@
-from .base import BaseDevice
-from ..functions.base import BaseFunction
-from ..functions.category import CategoryFunction
+"""Implementation of a fan device"""
+import datetime
+
+from hubspaceng.models.devices.base import BaseDevice
+from hubspaceng.models.functions.category import CategoryFunction
 
 class FanDevice(BaseDevice):
-    power: CategoryFunction = None
-    comfort_breeze: CategoryFunction = None
-    fan_speed: CategoryFunction = None
+    """Implementation of a fan device"""
+    power: CategoryFunction
+    comfort_breeze: CategoryFunction
+    fan_speed: CategoryFunction
 
-    def __init__(self, id: str, title: str, raw_fragment: dict):
-        super().__init__(id, title, raw_fragment)
-        raw_functions = raw_fragment['description']['functions']
+    def __init__(
+            self,
+            device_json: dict,
+            account: "HubspaceAccount",
+            state_update: datetime,
+        ):
+        super().__init__(device_json, account, state_update)
+        raw_functions = device_json['description']['functions']
         for raw_function in raw_functions:
-            if raw_function["functionClass"] == "power" and raw_function["type"] == "category":
-                power = CategoryFunction(raw_function['id'], "Power", raw_function)
-            elif raw_function["functionClass"] == "comfort-breeze" and raw_function["type"] == "category":
-                comfort_breeze = CategoryFunction(raw_function['id'], "Comfort Breeze", raw_function)
-            elif raw_function["functionClass"] == "fan-speed" and raw_function["type"] == "category":
-                fan_speed = CategoryFunction(raw_function['id'], "Fan Speed", raw_function)
+            func_class = raw_function.get('functionClass')
+            func_instance = raw_function.get('functionInstance')
+            func_type = raw_function.get('type')
+            if func_class == "power" and func_instance == "fan-power" and func_type == "category":
+                self.power = CategoryFunction("Power", self, raw_function)
+                self._functions.append(self.power)
+            elif func_class == "toggle" and func_instance == "comfort-breeze" and func_type == "category":
+                self.comfort_breeze = CategoryFunction("Comfort Breeze", self, raw_function)
+                self._functions.append(self.comfort_breeze)
+            elif func_class == "fan-speed" and func_instance == "fan-speed" and func_type == "category":
+                self.fan_speed = CategoryFunction("Fan Speed", self, raw_function)
+                self._functions.append(self.fan_speed)
 
-    def turn_on(self):
-        self.set_state(power, 'on')
+    async def turn_on(self):
+        """Turn the fan on"""
+        await self.set_state(self.power, 'on')
 
-    def turn_off(self):
-        self.set_state(power, 'off')
+    async def turn_off(self):
+        """Turn the fan off"""
+        await self.set_state(self.power, 'off')
 
-    def is_on(self):
-        return self.get_state(power)
+    async def is_on(self):
+        """Return whether or not the fan is on"""
+        return self.get_state(self.power) == 'on'
 
-    def set_comfort_breeze(self, new_comfort_breeze: str):
-        self.set_state(comfort_breeze, new_comfort_breeze)
+    async def set_comfort_breeze(self, new_comfort_breeze: str):
+        """Change breeze mode, the fan speed cycling function"""
+        await self.set_state(self.comfort_breeze, new_comfort_breeze)
 
-    def get_comfort_breeze(self):
-        return self.get_state(comfort_breeze)
+    async def get_comfort_breeze(self):
+        """Get the status of breeze mode, the fan speed cycling function"""
+        return self.get_state(self.comfort_breeze)
 
-    def set_fan_speed(self, new_fan_speed: str):
-        self.set_state(fan_speed, new_fan_speed)
+    async def set_fan_speed(self, new_fan_speed: str):
+        """Change the fan speed"""
+        await self.set_state(self.fan_speed, new_fan_speed)
 
-    def get_fan_speed(self):
-        return self.get_state(fan_speed)
-
-    def get_state(self, function: BaseFunction):
-        if function is None:
-            raise NotImplementedError(f"Function is not implemented for device {self.id}")
-        else:
-            return function.get_state()
-
-    def set_state(self, function: BaseFunction, new_value):
-        if function is None:
-            raise NotImplementedError(f"Function is not implemented for device {self.id}")
-        else:
-            function.set_state(new_value)
+    async def get_fan_speed(self):
+        """Get the current fan speed"""
+        return self.get_state(self.fan_speed)

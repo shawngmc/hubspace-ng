@@ -1,53 +1,62 @@
-from .base import BaseDevice
-from ..functions.base import BaseFunction
-from ..functions.category import CategoryFunction
-from ..functions.range import RangeFunction
+"""Implementation of a light device"""
+import datetime
+
+from hubspaceng.models.devices.base import BaseDevice
+from hubspaceng.models.functions.category import CategoryFunction
+from hubspaceng.models.functions.range import RangeFunction
 
 class LightDevice(BaseDevice):
+    """Implementation of a light device"""
     brightness: RangeFunction = None
     power: CategoryFunction = None
     color_temp: CategoryFunction = None
-    
-    def __init__(self, id: str, title: str, raw_fragment: dict):
-        super().__init__(id, title, raw_fragment)
-        raw_functions = raw_fragment['description']['functions']
+
+    def __init__(
+            self,
+            device_json: dict,
+            account: "HubspaceAccount",
+            state_update: datetime,
+        ):
+        super().__init__(device_json, account, state_update)
+        raw_functions = device_json['description']['functions']
         for raw_function in raw_functions:
-            if raw_function["functionClass"] == "color-temperature" and raw_function["type"] == "category":
-                color_temp = CategoryFunction(raw_function['id'], "Color Temperature", raw_function)
-            elif raw_function["functionClass"] == "power" and raw_function["type"] == "category":
-                power = CategoryFunction(raw_function['id'], "Power", raw_function)
-            elif raw_function["functionClass"] == "brightness" and raw_function["type"] == "numeric":
-                brightness = RangeFunction(raw_function['id'], "Brightness", raw_function)
+            func_class = raw_function.get('functionClass')
+            func_instance = raw_function.get('functionInstance')
+            func_type = raw_function.get('type')
+            if func_class == "color-temperature" and func_instance is None and func_type == "category":
+                self.color_temp = CategoryFunction("Color Temperature", self, raw_function)
+                self._functions.append(self.color_temp)
+            elif func_class == "power" and func_instance == "light-power" and func_type == "category":
+                self.power = CategoryFunction("Power", self, raw_function)
+                self._functions.append(self.power)
+            elif func_class == "brightness" and func_instance is None and func_type == "numeric":
+                self.brightness = RangeFunction("Brightness", self, raw_function)
+                self._functions.append(self.brightness)
 
-    def turn_on(self):
-        self.set_state(power, 'on')
+    async def turn_on(self):
+        """Turn the light on"""
+        await self.set_state(self.power, 'on')
 
-    def turn_off(self):
-        self.set_state(power, 'off')
+    async def turn_off(self):
+        """Turn the light off"""
+        await self.set_state(self.power, 'off')
 
-    def is_on(self):
-        return self.get_state(power)
+    async def is_on(self):
+        """Return whether or not the light is on"""
+        return self.get_state(self.power) == 'on'
 
-    def set_brightness(self, new_brightness: int):
-        self.set_state(brightness, new_brightness)
+    async def set_brightness(self, new_brightness: int):
+        """Change the brightness of the light"""
+        await self.set_state(self.brightness, new_brightness)
 
-    def get_brightness(self):
-        return self.get_state(brightness)
+    async def get_brightness(self):
+        """Get the brightness of the light"""
+        return self.get_state(self.brightness)
 
-    def set_color_temp(self, new_color_temp: str):
-        self.set_state(color_temp, new_color_temp)
+    async def set_color_temp(self, new_color_temp: str):
+        """Change the color temperature of the light"""
+        await self.set_state(self.color_temp, new_color_temp)
 
-    def get_color_temp(self):
-        return self.get_state(color_temp)
-
-    def get_state(self, function: BaseFunction):
-        if function is None:
-            raise NotImplementedError(f"Function is not implemented for device {self.id}")
-        else:
-            return function.get_state()
-
-    def set_state(self, function: BaseFunction, new_value):
-        if function is None:
-            raise NotImplementedError(f"Function is not implemented for device {self.id}")
-        else:
-            function.set_state(new_value)
+    async def get_color_temp(self):
+        """Get the color temperature of the light"""
+        return self.get_state(self.color_temp)
