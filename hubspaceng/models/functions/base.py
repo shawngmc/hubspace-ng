@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 
 from hubspaceng.const import METADATA_API_CALLING_HOST, METADATA_API_HOST
 from hubspaceng.errors import RequestError
-from hubspaceng.util import getUTCTime
+from hubspaceng.util import get_utc_time
 if TYPE_CHECKING:
     from hubspaceng.account import HubspaceAccount
     from hubspaceng.models.devices import BaseDevice
@@ -88,7 +88,7 @@ class BaseFunction:
         return state
 
     async def _set_remote_state(self, state):
-        utc_time = getUTCTime()
+        utc_time = get_utc_time()
         payload = {
             "metadeviceId": str(self.device.id),
             "values": [

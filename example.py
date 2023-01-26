@@ -1,10 +1,7 @@
-# Testing aiohttp comms
-# Use myq library as an example: https://pypi.org/project/pymyq/
-# aiohttp ClientSession object will track session and connection pool for me, as well as be async
+"""Example of basic hubspace-ng usage"""
 
 import json
 import asyncio
-import logging
 
 from aiohttp import ClientSession
 
@@ -24,6 +21,7 @@ else:
 
 
 async def main():
+    """Example of asynchronous functionality"""
     async with ClientSession() as websession:
         hubspace_api = await hubspace.login(creds['username'], creds['password'], websession)
 
