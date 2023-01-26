@@ -23,13 +23,19 @@ class LightDevice(BaseDevice):
             func_class = raw_function.get('functionClass')
             func_instance = raw_function.get('functionInstance')
             func_type = raw_function.get('type')
-            if func_class == "color-temperature" and func_instance is None and func_type == "category":
+            if func_class == "color-temperature" and \
+               func_instance is None and \
+               func_type == "category":
                 self.color_temp = CategoryFunction("Color Temperature", self, raw_function)
                 self._functions.append(self.color_temp)
-            elif func_class == "power" and func_instance == "light-power" and func_type == "category":
+            elif func_class == "power" and \
+                 func_instance == "light-power" and \
+                 func_type == "category":
                 self.power = CategoryFunction("Power", self, raw_function)
                 self._functions.append(self.power)
-            elif func_class == "brightness" and func_instance is None and func_type == "numeric":
+            elif func_class == "brightness" and \
+                 func_instance is None and \
+                 func_type == "numeric":
                 self.brightness = RangeFunction("Brightness", self, raw_function)
                 self._functions.append(self.brightness)
 

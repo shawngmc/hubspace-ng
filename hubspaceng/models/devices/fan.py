@@ -22,13 +22,19 @@ class FanDevice(BaseDevice):
             func_class = raw_function.get('functionClass')
             func_instance = raw_function.get('functionInstance')
             func_type = raw_function.get('type')
-            if func_class == "power" and func_instance == "fan-power" and func_type == "category":
+            if func_class == "power" and \
+               func_instance == "fan-power" and \
+               func_type == "category":
                 self.power = CategoryFunction("Power", self, raw_function)
                 self._functions.append(self.power)
-            elif func_class == "toggle" and func_instance == "comfort-breeze" and func_type == "category":
+            elif func_class == "toggle" and \
+                 func_instance == "comfort-breeze" and \
+                 func_type == "category":
                 self.comfort_breeze = CategoryFunction("Comfort Breeze", self, raw_function)
                 self._functions.append(self.comfort_breeze)
-            elif func_class == "fan-speed" and func_instance == "fan-speed" and func_type == "category":
+            elif func_class == "fan-speed" and \
+                 func_instance == "fan-speed" and \
+                 func_type == "category":
                 self.fan_speed = CategoryFunction("Fan Speed", self, raw_function)
                 self._functions.append(self.fan_speed)
 

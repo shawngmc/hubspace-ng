@@ -143,7 +143,7 @@ class API:  # pylint: disable=too-many-instance-attributes
                 try:
                     await self.authenticate(wait=True)
                 except AuthenticationError as auth_err:
-                    message = f"Error trying to re-authenticate to Hubspace service: {str(auth_err)}"
+                    message = f"Error trying to re-authenticate to Hubspace: {str(auth_err)}"
                     _LOGGER.debug(message)
                     raise AuthenticationError(message) from auth_err
             else:

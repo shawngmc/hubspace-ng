@@ -91,7 +91,7 @@ class HubspaceAccount:
         # Ensure we have a valid list of devices
         if metadevices_resp is not None and not isinstance(metadevices_resp, list):
             raise HubspaceError(
-                f"Received object metadevices_resp of type {type(metadevices_resp)} but expecting type list"
+                f"Received metadevices of type {type(metadevices_resp)} but expecting type list"
             )
 
         # Parse the response into appropriate objects
