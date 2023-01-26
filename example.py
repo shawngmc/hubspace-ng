@@ -8,8 +8,6 @@ from aiohttp import ClientSession
 import hubspaceng as hubspace
 from hubspaceng.models.devices.combo import ComboDevice
 
-# logging.basicConfig(level=logging.DEBUG)
-
 with open("creds.json", "r", encoding = "utf-8") as cred_file:
     creds = json.loads(cred_file.read())
 
