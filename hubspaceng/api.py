@@ -309,21 +309,6 @@ class API:  # pylint: disable=too-many-instance-attributes
 
     async def _oauth_authenticate(self) -> Tuple[str, int]:
 
-        # HubspaceSessionClient.__init__
-        # HubspaceSessionClient.getAccountID
-        # HubspaceSessionClient.getInfo
-        # HubspaceSessionClient.get
-        # HubspaceSessionClient._getHeaders
-        # HubspaceSessionClient._getAuthorization
-        # HubspaceSessionClient._getAccessToken
-        # HubspaceSessionClient._getRefreshToken
-        # _getRefreshToken
-        # _getTokenBody
-        # HubspaceSessionClient.getAccountID
-        # HubspaceSessionClient.get
-        # HubspaceSessionClient._getHeaders
-        # HubspaceSessionClient._getAuthorization
-        # HubspaceSessionClient._getAccessToken
         async with ClientSession() as session:
 
             # Get Session Code
@@ -355,15 +340,6 @@ class API:  # pylint: disable=too-many-instance-attributes
             session_code = re.search('session_code=(.+?)&', session_text).group(1)
             execution = re.search('execution=(.+?)&', session_text).group(1)
             tab_id = re.search('tab_id=(.+?)&', session_text).group(1)
-
-
-            # print(f"session_code: {session_code}")
-            # print(f"execution: {execution}")
-            # print(f"tab_id: {tab_id}")
-            # print(f"self.username: {self.username}")
-            # print(f"password: {self.__credentials['password']}")
-            # print(f"code_verifier: {self._code_verifier}")
-
 
             # Authenticate
             _LOGGER.debug("Phase 2 - Login Action")

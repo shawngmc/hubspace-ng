@@ -1,6 +1,9 @@
 """Function class to describe ranged integer settings"""
+import logging
+
 from hubspaceng.models.functions.base import BaseFunction
 
+_LOGGER = logging.getLogger(__name__)
 class RangeFunction(BaseFunction):
     """Function class to describe ranged integer settings, like 1-100 for brightness"""
     min_value: int
@@ -19,12 +22,12 @@ class RangeFunction(BaseFunction):
         new_value = int(new_value)
 
         if new_value < self.min_value:
-            # print("too low")
+            _LOGGER.debug(f"Value of {new_value} is lower than minimum value {self.min_value}")
             return False
         if new_value > self.max_value:
-            # print("too high")
+            _LOGGER.debug(f"Value of {new_value} is higher than maximum value {self.max_value}")
             return False
         if (new_value - self.min_value) % self.step > 0:
-            # print("invalid step")
+            _LOGGER.debug(f"Value of {new_value} is not a step {self.step} from minimum value {self.min_value}")
             return False
         return True

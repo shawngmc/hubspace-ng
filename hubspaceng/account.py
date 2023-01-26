@@ -9,7 +9,12 @@ from hubspaceng.const import (
     METADATA_API_CALLING_HOST,
     METADATA_API_HOST
 )
-from hubspaceng.models.devices import BaseDevice, ComboDevice, FanDevice, LightDevice
+from hubspaceng.models.devices import (
+    BaseDevice,
+    ComboDevice,
+    FanDevice,
+    LightDevice
+)
 from hubspaceng.models.places import Home, Room
 from hubspaceng.errors import HubspaceError
 
@@ -19,7 +24,6 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_STATE_UPDATE_INTERVAL = timedelta(seconds=5)
-
 
 class HubspaceAccount:
     """Define an account."""
@@ -112,6 +116,7 @@ class HubspaceAccount:
                             device = FanDevice(metadevice, self, state_update_timestmp)
                         elif device_class == "light":
                             device = LightDevice(metadevice, self, state_update_timestmp)
+                        # TODO: Support other device types
 
                         self._devices[device_id] = device
 
