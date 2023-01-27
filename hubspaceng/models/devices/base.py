@@ -1,5 +1,4 @@
 """Basic implementation of a device in the Hubspace API"""
-import asyncio
 from datetime import datetime
 import logging
 from typing import TYPE_CHECKING, Optional

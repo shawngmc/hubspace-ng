@@ -1,4 +1,9 @@
 [MESSAGES CONTROL]
-# W1202, W1203Allow f-string log messages
+# W1202, W1203 Allow f-string log messages
+# C0301 Ignore long lines
 enable=W1202
-disable=W1203
+disable=W1203,C0301
+
+[BASIC]
+# Good variable names which should always be accepted, separated by a comma
+good-names=id,ex,_
