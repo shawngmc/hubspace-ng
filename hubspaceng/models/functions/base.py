@@ -1,7 +1,11 @@
 """Basic implementation of a configurable device function"""
 from typing import TYPE_CHECKING, Any, Optional
 
-from hubspaceng.const import METADATA_API_CALLING_HOST, METADATA_API_HOST
+from hubspaceng.const import (
+    METADATA_API_CALLING_HOST,
+    METADATA_API_HOST,
+    USER_AGENT
+)
 from hubspaceng.errors import RequestError
 from hubspaceng.util import get_utc_time
 if TYPE_CHECKING:
@@ -80,7 +84,7 @@ class BaseFunction:
             returns="json",
             url=self._get_device_url(),
             headers = {
-                "user-agent": "Dart/2.15 (dart:io)",
+                "user-agent": USER_AGENT,
                 "Accept": "application/json",
                 "accept-encoding": "gzip",
                 "host": METADATA_API_CALLING_HOST
@@ -115,7 +119,7 @@ class BaseFunction:
             returns="json",
             url=self._get_device_url(),
             headers = {
-                "user-agent": "Dart/2.15 (dart:io)",
+                "user-agent": USER_AGENT,
                 "host": METADATA_API_CALLING_HOST,
                 "accept-encoding": "gzip",
                 "content-type": "application/json; charset=utf-8",
