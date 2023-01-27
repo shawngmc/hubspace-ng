@@ -46,7 +46,7 @@ class FanDevice(BaseDevice):
         """Turn the fan off"""
         await self.set_state(self.power, 'off')
 
-    async def is_on(self):
+    async def is_on(self) -> bool:
         """Return whether or not the fan is on"""
         return self.get_state(self.power) == 'on'
 
@@ -54,7 +54,7 @@ class FanDevice(BaseDevice):
         """Change breeze mode, the fan speed cycling function"""
         await self.set_state(self.comfort_breeze, new_comfort_breeze)
 
-    async def get_comfort_breeze(self):
+    async def get_comfort_breeze(self) -> str:
         """Get the status of breeze mode, the fan speed cycling function"""
         return self.get_state(self.comfort_breeze)
 
@@ -62,6 +62,6 @@ class FanDevice(BaseDevice):
         """Change the fan speed"""
         await self.set_state(self.fan_speed, new_fan_speed)
 
-    async def get_fan_speed(self):
+    async def get_fan_speed(self) -> str:
         """Get the current fan speed"""
         return self.get_state(self.fan_speed)

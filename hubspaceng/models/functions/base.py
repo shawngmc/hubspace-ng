@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 class BaseFunction:
     """Basic implementation of a configurable device function"""
-    id: str
+    _id: str
     title: str
     device: "BaseDevice"
     raw_fragment: dict
@@ -22,7 +22,7 @@ class BaseFunction:
         title: str,
         device: "BaseDevice",
         raw_fragment: dict):
-        self.id = raw_fragment["id"]
+        self._id = raw_fragment["id"]
         self.device = device
         self.title = title
         self.func_class = raw_fragment.get('functionClass')
@@ -35,7 +35,12 @@ class BaseFunction:
         return self.device.api
 
     @property
-    def value(self):
+    def id(self) -> str:
+        """Return the function ID"""
+        return self._id
+
+    @property
+    def value(self) -> Any:
         """Return the value for this device function"""
         return self._value
 
@@ -60,14 +65,14 @@ class BaseFunction:
         except Exception as ex:
             raise RequestError(f"Could not update device {self.id}") from ex
 
-    def validate_state(self, new_value):
-        """Validate a potential new value for this function, either from the server or from client code"""
+    def validate_state(self, new_value) -> bool:
+        """Validate a new value for this function, either from the server or from client code"""
         raise NotImplementedError()
 
-    def _get_device_url(self):
+    def _get_device_url(self) -> str:
         return f"https://{METADATA_API_HOST}/v1/accounts/{self.device.account.id}/metadevices/{self.device.id}/state"
 
-    async def _get_remote_state(self):
+    async def _get_remote_state(self) -> Any:
         _, state_resp = await self.api.request(
             method="get",
             returns="json",
@@ -87,7 +92,7 @@ class BaseFunction:
 
         return state
 
-    async def _set_remote_state(self, state):
+    async def _set_remote_state(self, state) -> Any:
         utc_time = get_utc_time()
         payload = {
             "metadeviceId": str(self.device.id),
@@ -102,7 +107,6 @@ class BaseFunction:
 
         if self.func_instance is not None:
             payload["values"][0]["functionInstance"] = self.func_instance
-            # _LOGGER.debug("setting state with instance: " + self.func_instance )
 
         _, set_resp = await self.api.request(
             method="PUT",

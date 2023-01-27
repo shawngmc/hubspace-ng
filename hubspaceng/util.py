@@ -2,7 +2,7 @@
 import calendar
 import datetime
 
-def get_utc_time():
+def get_utc_time() -> int:
     """Get current UTC time"""
     date = datetime.datetime.utcnow()
     utc_time = calendar.timegm(date.utctimetuple()) * 1000

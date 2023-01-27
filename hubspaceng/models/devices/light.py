@@ -47,7 +47,7 @@ class LightDevice(BaseDevice):
         """Turn the light off"""
         await self.set_state(self.power, 'off')
 
-    async def is_on(self):
+    async def is_on(self) -> bool:
         """Return whether or not the light is on"""
         return self.get_state(self.power) == 'on'
 
@@ -55,7 +55,7 @@ class LightDevice(BaseDevice):
         """Change the brightness of the light"""
         await self.set_state(self.brightness, new_brightness)
 
-    async def get_brightness(self):
+    async def get_brightness(self) -> int:
         """Get the brightness of the light"""
         return self.get_state(self.brightness)
 
@@ -63,6 +63,6 @@ class LightDevice(BaseDevice):
         """Change the color temperature of the light"""
         await self.set_state(self.color_temp, new_color_temp)
 
-    async def get_color_temp(self):
+    async def get_color_temp(self) -> str:
         """Get the color temperature of the light"""
         return self.get_state(self.color_temp)

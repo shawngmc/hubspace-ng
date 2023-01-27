@@ -26,7 +26,7 @@ class Room(Place):
         """Add a device to this room"""
         self._devices[device.id] = device
 
-    def get_unlinked_children(self):
+    def get_unlinked_children(self) -> list[str]:
         """Return a list of children that are in the JSON, but no object is linked"""
         all_children = self._device_json['children']
         known_children = self._devices.keys()
@@ -34,6 +34,6 @@ class Room(Place):
         return missing_children
 
     @property
-    def devices(self):
+    def devices(self) -> dict[BaseDevice]:
         """Get the devices in this room"""
         return self._devices

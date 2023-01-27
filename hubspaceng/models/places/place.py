@@ -1,6 +1,6 @@
 """Basic implementation of a place, parent class of Home and Room"""
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from hubspaceng.account import HubspaceAccount
@@ -25,16 +25,16 @@ class Place:
         self.state_update = state_update
 
     @property
-    def id(self):
+    def id(self) -> str:
         """Return the ID for this Place"""
         return self._id
 
     @property
-    def name(self):
+    def name(self) -> Optional[str]:
         """Return the name for this Place"""
         return self._name
 
     @property
-    def account(self):
+    def account(self) -> "HubspaceAccount":
         """Return the account object"""
         return self._account

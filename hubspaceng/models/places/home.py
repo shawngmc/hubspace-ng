@@ -33,6 +33,6 @@ class Home(Place):
         return missing_children
 
     @property
-    def rooms(self):
+    def rooms(self) -> dict[Room]:
         """Get the rooms in this home"""
         return self._rooms

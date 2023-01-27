@@ -82,22 +82,3 @@ class BaseDevice:
             raise NotImplementedError(f"Function is not implemented for device {self.id}")
         else:
             await function.set_state(new_value)
-
-    # NO_CRITERIA = "NULL"
-    # def _filter_raw_functions(self, 
-    #     device_json: dict,
-    #     filter_class:str = NO_CRITERIA,
-    #     filter_instance:str = NO_CRITERIA,
-    #     filter_type:str = NO_CRITERIA):
-    #     raw_functions = copy.deepcopy(device_json['description']['functions'])
-    #     for raw_function in raw_functions:
-    #         # Check class
-    #         if filter_class != self.NO_CRITERIA and filter_class != raw_function.get('functionClass'):
-    #             raw_function.remove(raw_function)
-    #         # Check instance
-    #         if filter_instance != self.NO_CRITERIA and filter_instance != raw_function.get('functionInstance'):
-    #             raw_function.remove(raw_function)
-    #         # Check type
-    #         if filter_type != self.NO_CRITERIA and filter_type != raw_function.get('type'):
-    #             raw_function.remove(raw_function)
-    #     return raw_functions

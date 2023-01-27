@@ -10,11 +10,11 @@ class ComboDevice(BaseDevice):
         self._children[child.id] = child
 
     @property
-    def children(self):
+    def children(self) -> dict[BaseDevice]:
         """Return the list of child devices"""
         return self._children
 
-    def get_unlinked_children(self):
+    def get_unlinked_children(self) -> list[str]:
         """Return a list of children that are in the JSON, but no object is linked"""
         all_children = self.device_json['children']
         known_children = self._children.keys()
