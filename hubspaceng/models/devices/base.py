@@ -29,10 +29,6 @@ class BaseDevice:
         self._id = device_json.get("id")
         self._functions = []
         self.last_state_update = state_update
-        self.state_update = None
-        self._device_state = None  # Type: Optional[str]
-        self._send_command_lock = asyncio.Lock()  # type: asyncio.Lock
-        self._wait_for_state_task = None
 
     @property
     def api(self) -> "API":

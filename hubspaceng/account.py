@@ -1,4 +1,4 @@
-"""Define Hubspace accounts."""
+"""Object describing an Account that the logged in user can access."""
 
 import asyncio
 from datetime import datetime, timedelta
@@ -26,7 +26,7 @@ _LOGGER = logging.getLogger(__name__)
 DEFAULT_STATE_UPDATE_INTERVAL = timedelta(seconds=5)
 
 class HubspaceAccount:
-    """Define an account."""
+    """Object describing an Account that the logged in user can access."""
 
     def __init__(self, api: "API", account_json: dict, devices: Optional[dict] = None) -> None:
 

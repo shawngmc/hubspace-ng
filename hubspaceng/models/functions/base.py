@@ -1,5 +1,5 @@
 """Basic implementation of a configurable device function"""
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from hubspaceng.const import METADATA_API_CALLING_HOST, METADATA_API_HOST
 from hubspaceng.errors import RequestError
@@ -15,7 +15,8 @@ class BaseFunction:
     device: "BaseDevice"
     raw_fragment: dict
     func_class: str
-    func_instance: str
+    func_instance: Optional[str]
+    func_type: str
     _value: Any = None
 
     def __init__(self,
@@ -27,6 +28,7 @@ class BaseFunction:
         self.title = title
         self.func_class = raw_fragment.get('functionClass')
         self.func_instance = raw_fragment.get('functionInstance')
+        self.func_type = raw_fragment.get('type')
         self.raw_fragment = raw_fragment
 
     @property
