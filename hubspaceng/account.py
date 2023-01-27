@@ -73,13 +73,13 @@ class HubspaceAccount:
         """Return all rooms within account"""
         return self._rooms
 
-    async def _get_devices(self) -> None:
+    async def _get_metadevices(self) -> None:
         _LOGGER.debug("Retrieving devices for account %s", self.name or self.id)
 
         _, metadevices_resp = await self._api.request(
             method="get",
             returns="json",
-            url=f"https://{METADATA_API_HOST}/v1/accounts/{self.id}/metadevices",
+            url=f"https://{METADATA_API_HOST}/v1/accounts/{self.id}/metadevices?expansions=state",
             headers = {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
@@ -87,6 +87,11 @@ class HubspaceAccount:
                 "host": METADATA_API_CALLING_HOST
             }
         )
+
+        return metadevices_resp
+
+    def _parse_metadevices(self, metadevices_resp: dict) -> None:
+        _LOGGER.debug("Parsing devices for account %s", self.name or self.id)
 
         # Ensure we have a valid list of devices
         if metadevices_resp is not None and not isinstance(metadevices_resp, list):
@@ -146,7 +151,9 @@ class HubspaceAccount:
         else:
             _LOGGER.debug("No devices found for account %s", self.name or self.id)
 
-
+    async def get_metadevices_doc(self) -> dict:
+        """Get the a fresh metadevices doc for debug purposes"""
+        return await self._get_metadevices()
 
     async def update(self) -> None:
         """Get up-to-date device list."""
@@ -169,7 +176,8 @@ class HubspaceAccount:
                 )
                 return
 
-            await self._get_devices()
+            metadevices_doc = await self._get_metadevices()
+            self._parse_metadevices(metadevices_doc)
             for device in self._devices.values():
                 for function in device.functions:
                     await function.update()
