@@ -18,26 +18,24 @@ class LightDevice(BaseDevice):
             state_update: datetime,
         ):
         super().__init__(device_json, account, state_update)
-        raw_functions = device_json['description']['functions']
-        for raw_function in raw_functions:
-            func_class = raw_function.get('functionClass')
-            func_instance = raw_function.get('functionInstance')
-            func_type = raw_function.get('type')
-            if func_class == "color-temperature" and \
-               func_instance is None and \
-               func_type == "category":
-                self.color_temp = CategoryFunction("Color Temperature", self, raw_function)
-                self._functions.append(self.color_temp)
-            elif func_class == "power" and \
-                 func_instance == "light-power" and \
-                 func_type == "category":
-                self.power = CategoryFunction("Power", self, raw_function)
-                self._functions.append(self.power)
-            elif func_class == "brightness" and \
-                 func_instance is None and \
-                 func_type == "numeric":
-                self.brightness = RangeFunction("Brightness", self, raw_function)
-                self._functions.append(self.brightness)
+
+        # Find the power function
+        power_func_def = self.filter_function_def("power", "category")
+        if power_func_def is not None:
+            self.power = CategoryFunction("Power", self, power_func_def)
+            self._functions.append(self.power)
+
+        # Look for a color-temp function
+        color_temp_func_def = self.filter_function_def("color-temperature", "category")
+        if color_temp_func_def is not None:
+            self.color_temp = CategoryFunction("Color Temperature", self, color_temp_func_def)
+            self._functions.append(self.color_temp)
+
+        # Look for a brightness function
+        brightness_func_def = self.filter_function_def("brightness", "numeric")
+        if brightness_func_def is not None:
+            self.brightness = RangeFunction("Brightness", self, brightness_func_def)
+            self._functions.append(self.brightness)
 
     async def turn_on(self):
         """Turn the light on"""

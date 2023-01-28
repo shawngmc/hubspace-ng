@@ -17,21 +17,18 @@ class PlugDevice(BaseDevice):
             state_update: datetime,
         ):
         super().__init__(device_json, account, state_update)
-        raw_functions = device_json['description']['functions']
-        for raw_function in raw_functions:
-            func_class = raw_function.get('functionClass')
-            func_instance = raw_function.get('functionInstance')
-            func_type = raw_function.get('type')
-            if func_class == "timer" and \
-               func_instance is None and \
-               func_type == "numeric":
-                self.timer = RangeFunction("Timer", self, raw_function)
-                self._functions.append(self.timer)
-            elif func_class == "power" and \
-                 func_instance is None and \
-                 func_type == "category":
-                self.power = CategoryFunction("Power", self, raw_function)
-                self._functions.append(self.power)
+
+        # Find the power function
+        power_func_def = self.filter_function_def("power", "category")
+        if power_func_def is not None:
+            self.power = CategoryFunction("Power", self, power_func_def)
+            self._functions.append(self.power)
+
+        # Look for a timer function
+        timer_func_def = self.filter_function_def("timer", "numeric")
+        if timer_func_def is not None:
+            self.timer = RangeFunction("Timer", self, timer_func_def)
+            self._functions.append(self.timer)
 
     async def turn_on(self):
         """Turn the plug on"""
