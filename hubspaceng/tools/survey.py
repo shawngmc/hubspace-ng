@@ -1,46 +1,27 @@
 """Survey script to build full or anonymized metadata sets for analysis"""
 
-import argparse
-import asyncio
 import json
-import random
+import logging
 import uuid
 from zipfile import ZipFile
 
 from aiohttp import ClientSession
 
-import hubspaceng as hubspace
+from api import login
 
-with open("creds.json", "r", encoding = "utf-8") as cred_file:
-    creds = json.loads(cred_file.read())
+_LOGGER = logging.getLogger(__name__)
 
-if creds['username'] != '' and creds['password'] != '':
-    print("Credentials loaded...")
-else:
-    print("Check creds file...")
-    exit()
-
-def parseargs():
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-a', '--anonymize', action='store_true')
-    parser.add_argument('filename')
-
-    args = parser.parse_args()
-
-    return args
-
-def anonymize(meta_doc):
-
+def _anonymize(meta_doc):
     orig_ids = set()
 
     # Search for UUIDs
-    print("Finding UUIDs...")
+    _LOGGER.info("Finding UUIDs...")
     def find_uuids(obj, uuid_set):
         if isinstance(obj, str):
             try:
                 uuid.UUID(obj)
                 uuid_set.add(obj)
-            except:
+            except ValueError:
                 pass
         elif isinstance(obj, dict):
             for value in obj.values():
@@ -52,7 +33,6 @@ def anonymize(meta_doc):
     orig_ids.update(find_uuids(meta_doc, set()))
 
     def find_ids_by_name(obj, id_set, attr_name):
-        print(type(obj))
         if isinstance(obj, dict):
             for key, value in obj.items():
                 if key == attr_name and isinstance(value, str):
@@ -63,8 +43,8 @@ def anonymize(meta_doc):
             for item in obj:
                 id_set.update(find_ids_by_name(item, id_set, attr_name))
         return id_set
-    
-    print("Finding device IDs...")
+
+    _LOGGER.info("Finding device IDs...")
     orig_ids.update(find_ids_by_name(meta_doc, set(), 'deviceId'))
 
     # Create mapping replacement for IDs
@@ -72,10 +52,10 @@ def anonymize(meta_doc):
     for idx, orig_id in enumerate(orig_ids):
         id_map[orig_id] = str(uuid.UUID(int=idx))
     for orig_id, new_id in id_map.items():
-        print(f"{orig_id} to {new_id}")
-    
+        _LOGGER.info(f"{orig_id} to {new_id}")
+
     # Replace IDs
-    print("Replacing IDs...")
+    _LOGGER.info("Replacing IDs...")
     def replace_ids(obj, id_map):
         if isinstance(obj, str):
             if obj in id_map.keys():
@@ -114,43 +94,40 @@ def anonymize(meta_doc):
                 new_list.append(strip_value_by_func_class(item, func_class, replace_val))
             obj = new_list
         return obj
-        
-    print("Removing Wifi SSIDs...")
+
+    _LOGGER.info("Removing Wifi SSIDs...")
     meta_doc = strip_value_by_func_class(meta_doc, 'wifi-ssid', "SSID_REDACTED")
-    
-    print("Removing MAC addresses...")
+
+    _LOGGER.info("Removing MAC addresses...")
     meta_doc = strip_value_by_func_class(meta_doc, 'wifi-mac-address', "WIFI_MAC_REDACTED")
     meta_doc = strip_value_by_func_class(meta_doc, 'ble-mac-address', "BLE_MAC_REDACTED")
-    
-    print("Removing geo coords...")
+
+    _LOGGER.info("Removing geo coords...")
     meta_doc = strip_value_by_func_class(meta_doc, 'geo-coordinates', {"geo-coordinates": {"lat": "0.0", "lon": "0.0"}})
 
     return meta_doc
 
-async def main():
-    """Survey"""
-    args = parseargs()
+async def survey(username: str = None, password: str = None, anonymize:bool = False, out_path:str = None):
+    """Survey the provided Hubspace account"""
 
     # Get metadevices
-    print("Surveying devices...")
+    _LOGGER.info("Surveying devices...")
     async with ClientSession() as websession:
-        hubspace_api = await hubspace.login(creds['username'], creds['password'], websession)
+        hubspace_api = await login(username, password, websession)
         docs = {}
         for account_ref, account in hubspace_api.accounts.items():
             docs[account_ref] = await account.get_metadevices_doc()
 
     # If requested, anonymize
-    if args.anonymize:
+    if anonymize:
         anon_docs = {}
-        print("Anonymizing data...")
+        _LOGGER.info("Anonymizing data...")
         for account_ref, meta_doc in docs.items():
-            anon_docs[account_ref] = anonymize(meta_doc)
+            anon_docs[account_ref] = _anonymize(meta_doc)
         docs = anon_docs
 
     # Save to disk
-    print("Saving device survey results...")
-    with ZipFile(args.filename, 'w') as survey_zip:
+    _LOGGER.info("Saving device survey results...")
+    with ZipFile(out_path, 'w') as survey_zip:
         for account_ref, meta_doc in docs.items():
             survey_zip.writestr(f"{account_ref}_metadevices.json", json.dumps(meta_doc, indent=2))
-
-asyncio.run(main())

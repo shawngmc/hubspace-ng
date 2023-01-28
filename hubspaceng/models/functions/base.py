@@ -45,14 +45,12 @@ class BaseFunction:
         """Return the function ID"""
         return self._id
 
-    @property
-    def value(self) -> Any:
+    def get_state(self) -> Any:
         """Return the value for this device function"""
         return self._value
 
-    @value.setter
-    async def value(self, new_value):
-        """Change the state for this function viaa the API server"""
+    async def set_state(self, new_value: Any):
+        """Change the state for this function via the API server"""
         if not self.validate_state(new_value):
             raise ValueError(f"{new_value} is not a valid state for {self.title} ({self.id})")
         try:

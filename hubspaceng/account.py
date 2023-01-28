@@ -13,7 +13,8 @@ from hubspaceng.models.devices import (
     BaseDevice,
     ComboDevice,
     FanDevice,
-    LightDevice
+    LightDevice,
+    PlugDevice
 )
 from hubspaceng.models.places import Home, Room
 from hubspaceng.errors import HubspaceError
@@ -121,6 +122,8 @@ class HubspaceAccount:
                             device = FanDevice(metadevice, self, state_update_timestmp)
                         elif device_class == "light":
                             device = LightDevice(metadevice, self, state_update_timestmp)
+                        elif device_class == "power-outlet":
+                            device = PlugDevice(metadevice, self, state_update_timestmp)
                         # TODO: Support other device types
 
                         self._devices[device_id] = device
