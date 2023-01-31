@@ -1,9 +1,6 @@
 """Survey script to build full or anonymized metadata sets for analysis"""
 
-import json
 import logging
-import uuid
-from zipfile import ZipFile
 
 from aiohttp import ClientSession
 
@@ -64,4 +61,3 @@ async def report(username: str = None, password: str = None, detailed:bool = Fal
         accounts = hubspace_api.accounts
         for account in accounts.values():
             print_account(account)
-
