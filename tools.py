@@ -5,6 +5,7 @@ import asyncio
 import logging
 import json
 
+from hubspaceng.tools.report import report
 from hubspaceng.tools.survey import survey
 from hubspaceng.tools.test_connect import test_connect
 
@@ -29,8 +30,9 @@ def _read_creds():
 
 def _parseargs():
     parser = argparse.ArgumentParser(description='Get debug data from your Hubspace account.')
-    parser.add_argument('action', choices=['survey', 'connection_log'], help="the type of debugging to do")
+    parser.add_argument('action', choices=['survey', 'connection_log', 'report'], help="the type of debugging to do")
     parser.add_argument('-a', '--anonymize', action='store_true', help="Anonymize survey results; does not apply to other actions")
+    parser.add_argument('-d', '--detailed', action='store_true', help="When possible, create a more detailed product (state, etc.)")
     parser.add_argument('filename', help="file to output to")
 
     args = parser.parse_args()
@@ -48,5 +50,8 @@ async def main():
     elif args.action == 'connection_log':
         _LOGGER.info("Creating debug connection log...")
         await test_connect(creds['username'], creds['password'], args.filename)
+    elif args.action == 'report':
+        _LOGGER.info("Creating device report...")
+        await report(creds['username'], creds['password'], args.detailed, args.filename)
 
 asyncio.run(main())

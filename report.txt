@@ -1,0 +1,27 @@
+Surveying devices...
+Account: 10aeed66-0254-460f-8c63-0fde8fff240b
+  Home: Home (706a33e9-c35f-471e-b8db-4a64f0ee9c5e)
+    Room: Living Room (9d3918a7-8f7e-42bc-9e34-8f64ebb9ccff)
+      ComboDevice: LRFan (7f6e1b7f-9a9e-4878-8fe2-ad3bce6b09c7)
+        Device: CeilingFan (<class 'hubspaceng.models.devices.fan.FanDevice'>:9d189585-d434-4b09-8d3e-7d52310988b7)
+          Function: power:category:fan-power
+          Function: toggle:category:comfort-breeze
+          Function: fan-speed:category:fan-speed
+          Function: timer:numeric:fan-power
+        Device: CeilingLight (<class 'hubspaceng.models.devices.light.LightDevice'>:4cd166c8-54f7-4f84-b172-e67b2f455c4a)
+          Function: brightness:numeric:None
+          Function: color-temperature:category:None
+          Function: power:category:light-power
+      Device: LR Stair Lamp (<class 'hubspaceng.models.devices.light.LightDevice'>:a0ad21e2-65d3-4422-9c1f-df27513a63f9)
+        Function: color-sequence:category:custom
+        Function: color-sequence:category:preset
+        Function: speed:numeric:color-sequence
+        Function: color-temperature:numeric:None
+        Function: brightness:numeric:None
+        Function: restore-values:category:None
+        Function: color-mode:category:None
+        Function: power:category:None
+        Function: color-rgb:object:None
+      Device: Test Plug (<class 'hubspaceng.models.devices.plug.PlugDevice'>:bee38cb5-de5a-48b6-8ce9-888d6d9f1e59)
+        Function: timer:numeric:None
+        Function: power:category:None
