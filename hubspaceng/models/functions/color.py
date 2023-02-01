@@ -31,6 +31,13 @@ class ColorFunction(BaseFunction):
     def validate_state(self, new_value: Any) -> bool:
         return new_value is not None and isinstance(new_value, ColorValue)
 
+    def get_serializable_state(self, new_value: Any) -> Any:
+        """Convert a value to JSON to send to the server"""
+        if isinstance(new_value, ColorValue):
+            return new_value.as_hubspace_dict()
+        else:
+            raise ValueError("New color value to send to server should be a ColorValue")
+
 @dataclass(frozen=True)
 class ColorValue:
     """An immutable RGB color object"""
@@ -60,3 +67,17 @@ class ColorValue:
         parent_dict['color-rgb'] = color_dict
         json_str = json.dumps(parent_dict)
         return json_str
+
+    def as_simple_dict(self):
+        """Create a simple dictionary of r, g and b values"""
+        color_dict = dict()
+        color_dict["r"] = self.red
+        color_dict["g"] = self.green
+        color_dict["b"] = self.blue
+        return color_dict
+
+    def as_hubspace_dict(self):
+        """Create a dictionary equivalent to the JSON Hubspace expects"""
+        parent_dict = dict()
+        parent_dict['color-rgb'] = self.as_simple_dict()
+        return parent_dict

@@ -54,6 +54,7 @@ class BaseFunction:
         if not self.validate_state(new_value):
             raise ValueError(f"{new_value} is not a valid state for {self.title} ({self.id})")
         try:
+            new_value = self.get_serializable_state(new_value)
             await self._set_remote_state(new_value)
             self._value = new_value
         except Exception as ex:
@@ -63,7 +64,6 @@ class BaseFunction:
         """Update the value for this function from the API server"""
         try:
             new_value = await self._get_remote_state()
-            print(new_value)
             new_value = self.parse_state(new_value)
             if not self.validate_state(new_value):
                 raise ValueError(f"{new_value} is not a valid state for {self.title} ({self.id})")
@@ -77,6 +77,10 @@ class BaseFunction:
 
     def parse_state(self, new_value: Any) -> Any:
         """Parse a new value for this function from the server"""
+        return new_value
+
+    def get_serializable_state(self, new_value: Any) -> Any:
+        """Convert a value to JSON to send to the server"""
         return new_value
 
     def _get_device_url(self) -> str:
