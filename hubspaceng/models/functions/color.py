@@ -1,4 +1,4 @@
-"""Function class to describe ranged integer settings"""
+"""Function class to describe RGB color settings"""
 from dataclasses import dataclass
 import json
 from typing import Any
@@ -8,7 +8,7 @@ from hubspaceng.models.functions.base import BaseFunction
 
 _LOGGER = logging.getLogger(__name__)
 class ColorFunction(BaseFunction):
-    """Function class to describe ranged integer settings, like 1-100 for brightness"""
+    """Function class to describe RGB color settings"""
     min_value: int
     max_value: int
     step: int
