@@ -8,11 +8,11 @@ Account: 10aeed66-0254-460f-8c63-0fde8fff240b
           Function: toggle:category:comfort-breeze
           Function: fan-speed:category:fan-speed
           Function: timer:numeric:fan-power
-        Device: CeilingLight (<class 'hubspaceng.models.devices.light.LightDevice'>:4cd166c8-54f7-4f84-b172-e67b2f455c4a)
+        Device: CeilingLight (<class 'hubspaceng.models.devices.lights.tunable.TunableLightDevice'>:4cd166c8-54f7-4f84-b172-e67b2f455c4a)
           Function: brightness:numeric:None
           Function: color-temperature:category:None
           Function: power:category:light-power
-      Device: LR Stair Lamp (<class 'hubspaceng.models.devices.light.LightDevice'>:a0ad21e2-65d3-4422-9c1f-df27513a63f9)
+      Device: LR Stair Lamp (<class 'hubspaceng.models.devices.lights.rgb.RGBLightDevice'>:a0ad21e2-65d3-4422-9c1f-df27513a63f9)
         Function: color-sequence:category:custom
         Function: color-sequence:category:preset
         Function: speed:numeric:color-sequence

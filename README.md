@@ -16,6 +16,16 @@ A python package to interface with the Afero Hubspace service for smart home dev
 - Create a debug script that returns full or sanitized data
 - Improve call timer safety
 
+## Supported Device Types
+- Lights
+  - Basic dimmable lights: Yes
+  - Tunable lights: Yes
+  - RGB lights: In progress, currently identified
+- Plugs: Yes
+- Fans: Yes
+- Locks: No
+- Transformers: No
+
 ## Troubleshooting
 hubspace-ng includes a tools.py script to help debug common issues. This usess a creds.json file for your credentials.
 ```

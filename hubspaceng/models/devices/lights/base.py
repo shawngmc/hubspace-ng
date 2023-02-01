@@ -5,11 +5,10 @@ from hubspaceng.models.devices.base import BaseDevice
 from hubspaceng.models.functions.category import CategoryFunction
 from hubspaceng.models.functions.range import RangeFunction
 
-class LightDevice(BaseDevice):
-    """Implementation of a light device"""
+class BaseLightDevice(BaseDevice):
+    """Implementation of a basic light device"""
     brightness: RangeFunction = None
     power: CategoryFunction = None
-    color_temp: CategoryFunction = None
 
     def __init__(
             self,
@@ -24,12 +23,6 @@ class LightDevice(BaseDevice):
         if power_func_def is not None:
             self.power = CategoryFunction("Power", self, power_func_def)
             self._functions.append(self.power)
-
-        # Look for a color-temp function
-        color_temp_func_def = self.filter_function_def("color-temperature", "category")
-        if color_temp_func_def is not None:
-            self.color_temp = CategoryFunction("Color Temperature", self, color_temp_func_def)
-            self._functions.append(self.color_temp)
 
         # Look for a brightness function
         brightness_func_def = self.filter_function_def("brightness", "numeric")
@@ -56,11 +49,3 @@ class LightDevice(BaseDevice):
     async def get_brightness(self) -> int:
         """Get the brightness of the light"""
         return self.brightness.get_state()
-
-    async def set_color_temp(self, new_color_temp: str):
-        """Change the color temperature of the light"""
-        await self.color_temp.set_state(new_color_temp)
-
-    async def get_color_temp(self) -> str:
-        """Get the color temperature of the light"""
-        return self.color_temp.get_state()

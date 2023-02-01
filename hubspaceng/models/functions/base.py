@@ -63,15 +63,21 @@ class BaseFunction:
         """Update the value for this function from the API server"""
         try:
             new_value = await self._get_remote_state()
+            print(new_value)
+            new_value = self.parse_state(new_value)
             if not self.validate_state(new_value):
                 raise ValueError(f"{new_value} is not a valid state for {self.title} ({self.id})")
             self._value = new_value
         except Exception as ex:
             raise RequestError(f"Could not update device {self.id}") from ex
 
-    def validate_state(self, new_value) -> bool:
+    def validate_state(self, new_value: Any) -> bool:
         """Validate a new value for this function, either from the server or from client code"""
         raise NotImplementedError()
+
+    def parse_state(self, new_value: Any) -> Any:
+        """Parse a new value for this function from the server"""
+        return new_value
 
     def _get_device_url(self) -> str:
         return f"https://{METADATA_API_HOST}/v1/accounts/{self.device.account.id}/metadevices/{self.device.id}/state"
@@ -130,8 +136,9 @@ class BaseFunction:
                 if key == 'functionClass' and val == self.func_class:
                     state = lis.get('value')
 
-        if not self.validate_state(state):
+        new_state = self.parse_state(state)
+        if not self.validate_state(new_state):
             raise ValueError(f"{state} is not a valid state for {self.title} ({self.id})")
-        self._value = state
+        self._value = new_state
 
-        return state
+        return new_state

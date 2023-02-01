@@ -13,8 +13,13 @@ from hubspaceng.models.devices import (
     BaseDevice,
     ComboDevice,
     FanDevice,
-    LightDevice,
     PlugDevice
+)
+from hubspaceng.models.devices.base import filter_function_def
+from hubspaceng.models.devices.lights import (
+    BaseLightDevice,
+    TunableLightDevice,
+    RGBLightDevice
 )
 from hubspaceng.models.places import Home, Room
 from hubspaceng.errors import HubspaceError
@@ -121,7 +126,12 @@ class HubspaceAccount:
                         if device_class == "fan":
                             device = FanDevice(metadevice, self, state_update_timestmp)
                         elif device_class == "light":
-                            device = LightDevice(metadevice, self, state_update_timestmp)
+                            if filter_function_def(metadevice, "color-temperature", "category") is not None:
+                                device = TunableLightDevice(metadevice, self, state_update_timestmp)
+                            elif filter_function_def(metadevice, "color-rgb", "object") is not None:
+                                device = RGBLightDevice(metadevice, self, state_update_timestmp)
+                            else:
+                                device = BaseLightDevice(metadevice, self, state_update_timestmp)
                         elif device_class == "power-outlet":
                             device = PlugDevice(metadevice, self, state_update_timestmp)
                         # TODO: Support other device types
