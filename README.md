@@ -20,10 +20,11 @@ A python package to interface with the Afero Hubspace service for smart home dev
 - Lights
   - Basic dimmable lights: Yes
   - Tunable lights: Yes
-  - RGB lights: In progress, currently identified
+  - RGB lights: Yes
 - Plugs: Yes
 - Fans: Yes
-- Locks: No
+- Locks: Yes (Limited functionality only - lock/unlock, get lock state, get battery level)
+  - ***Currently not supporting the following functions for security purposes: toggling lock sound mode, configuring PIN numbers, managing admin pin, controlling keypad lockout.***
 - Transformers: No
 
 ## Troubleshooting

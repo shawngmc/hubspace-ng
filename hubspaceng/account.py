@@ -13,6 +13,7 @@ from hubspaceng.models.devices import (
     BaseDevice,
     ComboDevice,
     FanDevice,
+    LockDevice,
     PlugDevice
 )
 from hubspaceng.models.devices.base import filter_function_def
@@ -134,6 +135,8 @@ class HubspaceAccount:
                                 device = BaseLightDevice(metadevice, self, state_update_timestmp)
                         elif device_class == "power-outlet":
                             device = PlugDevice(metadevice, self, state_update_timestmp)
+                        elif device_class == "door-lock":
+                            device = LockDevice(metadevice, self, state_update_timestmp)
                         # TODO: Support other device types
 
                         self._devices[device_id] = device
