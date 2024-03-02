@@ -40,6 +40,7 @@ class BaseLightDevice(BaseDevice):
 
     async def is_on(self) -> bool:
         """Return whether or not the light is on"""
+        # import code; code.interact(local=locals())
         return self.power.get_state() == 'on'
 
     async def set_brightness(self, new_brightness: int):
