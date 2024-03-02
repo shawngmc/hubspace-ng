@@ -1,3 +1,6 @@
+# 0.0.3
+- Fixing packaging issue
+
 # 0.0.2
 - Testing automated publish
 
