@@ -19,7 +19,7 @@ class FanDevice(BaseDevice):
         super().__init__(device_json, account, state_update)
 
         # Find the power function
-        power_func_def = self.filter_function_def("power", "category")
+        power_func_def = self.filter_function_def("power", "category", instance_filter=["fan-power"])
         if power_func_def is not None:
             self.power = CategoryFunction("Power", self, power_func_def)
             self._functions.append(self.power)
@@ -38,28 +38,28 @@ class FanDevice(BaseDevice):
 
     async def turn_on(self):
         """Turn the fan on"""
-        await self.set_state(self.power, 'on')
+        await self.power.set_state('on')
 
     async def turn_off(self):
         """Turn the fan off"""
-        await self.set_state(self.power, 'off')
+        await self.power.set_state('off')
 
     async def is_on(self) -> bool:
         """Return whether or not the fan is on"""
-        return self.get_state(self.power) == 'on'
+        return self.power.get_state() == 'on'
 
     async def set_comfort_breeze(self, new_comfort_breeze: str):
         """Change breeze mode, the fan speed cycling function"""
-        await self.set_state(self.comfort_breeze, new_comfort_breeze)
+        await self.comfort_breeze.set_state(new_comfort_breeze)
 
     async def get_comfort_breeze(self) -> str:
         """Get the status of breeze mode, the fan speed cycling function"""
-        return self.get_state(self.comfort_breeze)
+        return self.comfort_breeze.get_state()
 
     async def set_fan_speed(self, new_fan_speed: str):
         """Change the fan speed"""
-        await self.set_state(self.fan_speed, new_fan_speed)
+        await self.fan_speed.set_state(new_fan_speed)
 
     async def get_fan_speed(self) -> str:
         """Get the current fan speed"""
-        return self.get_state(self.fan_speed)
+        return self.fan_speed.get_state()

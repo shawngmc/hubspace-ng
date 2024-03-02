@@ -39,8 +39,8 @@ async def main():
         print(f"Fan comfort breeze: {await fan.get_comfort_breeze()}")
 
         # Force-update a device
-        await light.update()
-        await fan.update()
+        # await light.update()
+        # await fan.update()
 
         # Turn the devices off
         await light.turn_off()
